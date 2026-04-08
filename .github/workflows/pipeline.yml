@@ -129,6 +129,15 @@ jobs:
       - name: Generate SEO files
         run: python generate_seo.py
 
+      - name: Sync to Supabase
+        run: |
+          python -c "
+          from backend.database.supabase_client import sync_to_supabase
+          result = sync_to_supabase()
+          print('Supabase sync:', 'success' if result else 'skipped (tables not ready)')
+          " || echo 'Supabase sync skipped'
+        continue-on-error: true
+
       - name: Commit and push updated data
         run: |
           git config user.name "KBI Pipeline Bot"
