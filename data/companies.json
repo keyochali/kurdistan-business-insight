@@ -1,19 +1,434 @@
 [
-  {"name": "Lezzoo", "url": "https://www.linkedin.com/company/lezzoo"},
-  {"name": "BlackAce Tech", "url": "https://www.linkedin.com/company/blackacetech"},
-  {"name": "Avesta Group", "url": "https://www.linkedin.com/company/avesta-group"},
-  {"name": "Next Step Fair", "url": "https://www.linkedin.com/company/next-step-fair"},
-  {"name": "Click Iraq", "url": "https://www.linkedin.com/company/click-iraq"},
-  {"name": "AppJobStudio", "url": "https://www.linkedin.com/company/appjobstudio"},
-  {"name": "Homele App", "url": "https://www.linkedin.com/company/homele-app"},
-  {"name": "Evercrest", "url": "https://www.linkedin.com/company/evercrest"},
-  {"name": "Asiacell", "url": "https://www.linkedin.com/company/asiacell"},
-  {"name": "Kurdistan Foundation", "url": "https://www.linkedin.com/company/kurdistanfoundation"},
-  {"name": "Ovanya", "url": "https://www.linkedin.com/company/ovanya"},
-  {"name": "Gigant Technology", "url": "https://www.linkedin.com/company/giganttechnology"},
-  {"name": "Awrosoft", "url": "https://www.linkedin.com/company/awrosoft"},
-  {"name": "LucidSource", "url": "https://www.linkedin.com/company/lucidsource"},
-  {"name": "Gateway ICT", "url": "https://www.linkedin.com/company/gateway-company-ict"},
-  {"name": "First Iraqi Bank", "url": "https://www.linkedin.com/company/firstiraqibank1"},
-  {"name": "Fastlink 4G", "url": "https://www.linkedin.com/company/fastlink4g"}
+  {
+    "name": "77 Group",
+    "url": "https://www.linkedin.com/company/77-group"
+  },
+  {
+    "name": "Al Handal International Group",
+    "url": "https://www.linkedin.com/company/al-handal-international-group"
+  },
+  {
+    "name": "Al Mouyasser \u2013 Fattal Group",
+    "url": "https://www.linkedin.com/company/al-mouyasser-llc"
+  },
+  {
+    "name": "Alas General Trading Company",
+    "url": "https://www.linkedin.com/in/barzan-abdulrahman-76960a107"
+  },
+  {
+    "name": "Allai Newroz Telecom",
+    "url": "https://www.linkedin.com/company/newroztelecom"
+  },
+  {
+    "name": "American University of Kurdistan (AUK)",
+    "url": "https://www.linkedin.com/company/american-university-of-kurdistan"
+  },
+  {
+    "name": "American-Kurdish Economic Institute (AKEI)",
+    "url": "https://www.linkedin.com/in/tara-shwan-3825501b"
+  },
+  {
+    "name": "AppJobStudio",
+    "url": "https://www.linkedin.com/company/appjobstudio"
+  },
+  {
+    "name": "Asiacell",
+    "url": "https://www.linkedin.com/company/asiacell"
+  },
+  {
+    "name": "Atconz Group",
+    "url": "https://www.linkedin.com/company/atconz-group"
+  },
+  {
+    "name": "Avesta Group",
+    "url": "https://www.linkedin.com/company/avesta-group"
+  },
+  {
+    "name": "Awrosoft",
+    "url": "https://www.linkedin.com/company/awrosoft"
+  },
+  {
+    "name": "Baghy Shaqlawa Real Estate",
+    "url": "https://www.linkedin.com/company/baghyshaqlawa-realestate"
+  },
+  {
+    "name": "BlackAce Tech",
+    "url": "https://www.linkedin.com/company/blackacetech"
+  },
+  {
+    "name": "BRA Block / Lava Block (Faris Group)",
+    "url": "https://www.linkedin.com/in/farisalfaris"
+  },
+  {
+    "name": "Buna Agency",
+    "url": "https://www.linkedin.com/in/ragir-sulaiman-b686a1205"
+  },
+  {
+    "name": "Business Line Iraq (SAP Gold Partner)",
+    "url": "https://www.linkedin.com/company/business-line-iraq"
+  },
+  {
+    "name": "Carduchi Consulting",
+    "url": "https://www.linkedin.com/in/shwanzulal"
+  },
+  {
+    "name": "Channel 8 (CHANNEL8)",
+    "url": "https://www.linkedin.com/company/channel8-media"
+  },
+  {
+    "name": "Cihan Group",
+    "url": "https://www.linkedin.com/company/cihan-group"
+  },
+  {
+    "name": "Cihan Insurance",
+    "url": "https://www.linkedin.com/company/cihan-insurance"
+  },
+  {
+    "name": "Cihan University Erbil",
+    "url": "https://www.linkedin.com/company/cihan-university-erbil"
+  },
+  {
+    "name": "Click Iraq",
+    "url": "https://www.linkedin.com/company/click-iraq"
+  },
+  {
+    "name": "Darin Group",
+    "url": "https://www.linkedin.com/company/darin-group"
+  },
+  {
+    "name": "Digital Shift Iraq",
+    "url": "https://www.linkedin.com/in/shamal-s-kareem"
+  },
+  {
+    "name": "Divan Erbil Hotel",
+    "url": "https://www.linkedin.com/company/divan-hotels-management"
+  },
+  {
+    "name": "DNO ASA (Kurdistan Operations)",
+    "url": "https://www.linkedin.com/company/dno-asa"
+  },
+  {
+    "name": "Doski Holding",
+    "url": "https://www.linkedin.com/company/doski-holding"
+  },
+  {
+    "name": "Ekleel Group (Ekleel Alsiha)",
+    "url": "https://www.linkedin.com/company/ekleel-group"
+  },
+  {
+    "name": "ELARA / Digital Vision",
+    "url": "https://www.linkedin.com/in/anashawar"
+  },
+  {
+    "name": "Empire World",
+    "url": "https://www.linkedin.com/company/empire-world-erbil"
+  },
+  {
+    "name": "Enlightors / One Connect (Business Dev)",
+    "url": "https://www.linkedin.com/in/zanamahmood"
+  },
+  {
+    "name": "Evercrest",
+    "url": "https://www.linkedin.com/company/evercrest"
+  },
+  {
+    "name": "EWB Iraq \u2013 Engineers Without Borders",
+    "url": "https://www.linkedin.com/in/hawar-mesud-341850283"
+  },
+  {
+    "name": "Falcon Group Iraq",
+    "url": "https://www.linkedin.com/company/falcongroup-iraq"
+  },
+  {
+    "name": "Faruk Investment Group (Faruk Holding)",
+    "url": "https://www.linkedin.com/company/faruk-investment-group"
+  },
+  {
+    "name": "Faruk Medical City / Hospital",
+    "url": "https://www.linkedin.com/company/faruk-medical-city"
+  },
+  {
+    "name": "Fastlink 4G",
+    "url": "https://www.linkedin.com/company/fastlink4g"
+  },
+  {
+    "name": "FastPay",
+    "url": "https://www.linkedin.com/company/fastpay-iq"
+  },
+  {
+    "name": "First Iraqi Bank",
+    "url": "https://www.linkedin.com/company/firstiraqibank1"
+  },
+  {
+    "name": "Gateway ICT",
+    "url": "https://www.linkedin.com/company/gateway-company-ict"
+  },
+  {
+    "name": "GEG Oil (Golden Eagle Global)",
+    "url": "https://www.linkedin.com/in/dana-mufti-1284a029"
+  },
+  {
+    "name": "Genel Energy",
+    "url": "https://www.linkedin.com/company/genel-energy"
+  },
+  {
+    "name": "Gigant Technology",
+    "url": "https://www.linkedin.com/company/giganttechnology"
+  },
+  {
+    "name": "Gigant Technology",
+    "url": "https://www.linkedin.com/in/hawrazware"
+  },
+  {
+    "name": "Grow Consulting / Institutional Dev.",
+    "url": "https://www.linkedin.com/in/shnamudher"
+  },
+  {
+    "name": "Gulf Keystone Petroleum",
+    "url": "https://www.linkedin.com/company/gulf-keystone-petroleum"
+  },
+  {
+    "name": "Hewa Group (Majidi / Sher Oil)",
+    "url": "https://www.linkedin.com/company/hewa-group"
+  },
+  {
+    "name": "Homele App",
+    "url": "https://www.linkedin.com/company/homele-app"
+  },
+  {
+    "name": "IMEX Groupage Logistics",
+    "url": "https://www.linkedin.com/in/pawan-salih-365b03288"
+  },
+  {
+    "name": "iQ Card (QiCard)",
+    "url": "https://www.linkedin.com/company/qi-card"
+  },
+  {
+    "name": "JAAHEEZ",
+    "url": "https://www.linkedin.com/in/rashwan-shareef"
+  },
+  {
+    "name": "KAR Group",
+    "url": "https://www.linkedin.com/company/karvn"
+  },
+  {
+    "name": "Karini Tav Co.",
+    "url": "https://www.linkedin.com/in/kareen-zuher-ab32501ba"
+  },
+  {
+    "name": "KATO General Contracting",
+    "url": "https://www.linkedin.com/in/salman-sulaiman"
+  },
+  {
+    "name": "Kavin Farm",
+    "url": "https://www.linkedin.com/company/kavin-farm-co"
+  },
+  {
+    "name": "Kawkab Group (Hawkary Pharma)",
+    "url": "https://www.linkedin.com/company/hawkary-pharmaceutical-co-"
+  },
+  {
+    "name": "Kayar Group",
+    "url": "https://www.linkedin.com/company/kayar-group-iraq"
+  },
+  {
+    "name": "KESK (Kurdish Energy & Solar)",
+    "url": "https://www.linkedin.com/in/basima-abdulrahman"
+  },
+  {
+    "name": "Khaldar Group",
+    "url": "https://www.linkedin.com/company/khaldar-group-iq"
+  },
+  {
+    "name": "Khoshnaw Company",
+    "url": "https://www.linkedin.com/company/khoshnaw-company"
+  },
+  {
+    "name": "Korek Telecom",
+    "url": "https://www.linkedin.com/company/korek-telecom"
+  },
+  {
+    "name": "Kosaran Engineering Company",
+    "url": "https://www.linkedin.com/in/bashdar-mahdi"
+  },
+  {
+    "name": "Kurd Inova",
+    "url": "https://www.linkedin.com/in/adam-aramo"
+  },
+  {
+    "name": "Kurdistan 24",
+    "url": "https://www.linkedin.com/company/kurdistan-24"
+  },
+  {
+    "name": "Kurdistan Foundation",
+    "url": "https://www.linkedin.com/company/kurdistanfoundation"
+  },
+  {
+    "name": "Kurdistan International Bank (KIB)",
+    "url": "https://www.linkedin.com/company/kurdistan-international-bank"
+  },
+  {
+    "name": "Kurdistan Pipeline Company (KPC)",
+    "url": "https://www.linkedin.com/company/kurdistan-pipeline-company"
+  },
+  {
+    "name": "Lafarge Iraq / Bazian Cement (Holcim)",
+    "url": "https://www.linkedin.com/in/medhat-ismail-241a1715"
+  },
+  {
+    "name": "Lezzoo",
+    "url": "https://www.linkedin.com/company/lezzoo"
+  },
+  {
+    "name": "LucidSource",
+    "url": "https://www.linkedin.com/company/lucidsource"
+  },
+  {
+    "name": "Mass Group Holding Ltd.",
+    "url": "https://www.linkedin.com/company/mass-group-holding-ltd-"
+  },
+  {
+    "name": "Mellat Holding",
+    "url": "https://www.linkedin.com/company/mellat-holding"
+  },
+  {
+    "name": "Miran Group (City Mall Suli)",
+    "url": "https://www.linkedin.com/company/miran-group-iraq"
+  },
+  {
+    "name": "Modern Group for Soft Drinks",
+    "url": "https://www.linkedin.com/in/mahmoud-yazegi-5b13184a"
+  },
+  {
+    "name": "Next Step Fair",
+    "url": "https://www.linkedin.com/company/next-step-fair"
+  },
+  {
+    "name": "Nokan Group",
+    "url": "https://www.linkedin.com/company/nokan-group"
+  },
+  {
+    "name": "North Bank",
+    "url": "https://www.linkedin.com/company/north-bank-iraq"
+  },
+  {
+    "name": "NRT TV (Kurdistan)",
+    "url": "https://www.linkedin.com/company/nrt-kurdistan"
+  },
+  {
+    "name": "Omran Engineering Group",
+    "url": "https://www.linkedin.com/in/shad-khaznadar-177ab417"
+  },
+  {
+    "name": "Ovanya",
+    "url": "https://www.linkedin.com/company/ovanya"
+  },
+  {
+    "name": "Paramount Logistics & Supply Chain",
+    "url": "https://www.linkedin.com/in/hawraz-jamal-08a5ba55"
+  },
+  {
+    "name": "Pioneer Pharmaceutical Company",
+    "url": "https://www.linkedin.com/company/pioneer-pharmaceutical"
+  },
+  {
+    "name": "Point Health Company",
+    "url": "https://www.linkedin.com/in/bakhtiyar-taheer-1233a51a0"
+  },
+  {
+    "name": "QAF Lab",
+    "url": "https://www.linkedin.com/in/mohammed-al-hashimie-380a6520"
+  },
+  {
+    "name": "Qaiwan Group",
+    "url": "https://www.linkedin.com/company/qaiwan-global-energy-trading-house-fzco"
+  },
+  {
+    "name": "Qaiwan International University",
+    "url": "https://www.linkedin.com/company/qaiwan-international-university"
+  },
+  {
+    "name": "Ramada by Wyndham Sulaymaniyah",
+    "url": "https://www.linkedin.com/company/ramada-worldwide"
+  },
+  {
+    "name": "Rebaz Jwameer Consulting / GFA",
+    "url": "https://www.linkedin.com/in/rebaz-jwameer-0bb04b96"
+  },
+  {
+    "name": "Region Trade Bank",
+    "url": "https://www.linkedin.com/company/region-trade-bank"
+  },
+  {
+    "name": "Rixos Duhok Hotel (UB Holding)",
+    "url": "https://www.linkedin.com/company/rixos-hotels"
+  },
+  {
+    "name": "Rotana Hotel Sulaymaniyah (Qaiwan)",
+    "url": "https://www.linkedin.com/company/rotana-hotel-management-corporation"
+  },
+  {
+    "name": "Rudaw Media Network",
+    "url": "https://www.linkedin.com/company/rudaw-media"
+  },
+  {
+    "name": "Safra Holding",
+    "url": "https://www.linkedin.com/company/safra-holding-iraq"
+  },
+  {
+    "name": "Salahaddin Holding (Salahaddin Investment)",
+    "url": "https://www.linkedin.com/company/salahaddin-holding-company"
+  },
+  {
+    "name": "Senk Group",
+    "url": "https://www.linkedin.com/company/senk-group"
+  },
+  {
+    "name": "Shanica Group of Companies",
+    "url": "https://www.linkedin.com/in/abdulwahidshanica"
+  },
+  {
+    "name": "Society Advertising",
+    "url": "https://www.linkedin.com/in/daner-hama-faraj-b513b512a"
+  },
+  {
+    "name": "Ster Group",
+    "url": "https://www.linkedin.com/company/ster-group-kurdisatan"
+  },
+  {
+    "name": "TeraTarget",
+    "url": "https://www.linkedin.com/company/teratarget"
+  },
+  {
+    "name": "Tishknet (Ster Group)",
+    "url": "https://www.linkedin.com/company/tishknet"
+  },
+  {
+    "name": "UB Holding",
+    "url": "https://www.linkedin.com/in/hadi-nezir-5212a54b"
+  },
+  {
+    "name": "Ultimate Talent HR Consulting",
+    "url": "https://www.linkedin.com/in/alibestani"
+  },
+  {
+    "name": "University of Kurdistan Hewl\u00ear (UKH)",
+    "url": "https://www.linkedin.com/company/university-of-kurdistan-hewler"
+  },
+  {
+    "name": "Volt Company Duhok",
+    "url": "https://www.linkedin.com/in/bawar-mzouri-a3b89077"
+  },
+  {
+    "name": "Zagros Group of Companies",
+    "url": "https://www.linkedin.com/in/aram-ali-ibrahim-sherwani-860b482a"
+  },
+  {
+    "name": "Zain Iraq",
+    "url": "https://www.linkedin.com/company/zainiraq"
+  },
+  {
+    "name": "Zozik Group",
+    "url": "https://www.linkedin.com/company/zozik-group"
+  }
 ]
