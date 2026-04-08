@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  body {
+    @apply bg-white text-neutral-900 antialiased;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+
+  ::selection {
+    @apply bg-accent-400/20 text-neutral-900;
+  }
+}
+
+@layer components {
+  /* Article body typography */
+  .article-body h2 {
+    @apply text-2xl font-bold font-serif text-neutral-900 mt-10 mb-4;
+  }
+  .article-body h3 {
+    @apply text-xl font-semibold font-serif text-neutral-800 mt-8 mb-3;
+  }
+  .article-body p {
+    @apply text-lg leading-relaxed text-neutral-600 mb-5;
+  }
+  .article-body blockquote {
+    @apply border-l-2 border-accent-400 pl-6 my-8 italic text-neutral-500;
+  }
+  .article-body ul {
+    @apply list-disc pl-6 mb-5 space-y-2;
+  }
+  .article-body li {
+    @apply text-lg text-neutral-600;
+  }
+  .article-body strong {
+    @apply font-semibold text-neutral-900;
+  }
+  .article-body a {
+    @apply text-neutral-900 underline decoration-accent-400 underline-offset-4 hover:decoration-2 transition-all;
+  }
+
+  /* Inline article images */
+  .article-body .article-inline-image {
+    @apply my-8 mx-0;
+  }
+  .article-body .article-inline-image img {
+    @apply w-full rounded-xl object-cover;
+    aspect-ratio: 1.91 / 1;
+  }
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}

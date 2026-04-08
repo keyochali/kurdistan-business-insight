@@ -1,0 +1,31 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+data/newsletter.db
+data/pipeline.log
+data/pipeline_output.log
+data/raw_scrape.json
+data/pipeline_summary.json
+
+# Node
+frontend/node_modules/
+frontend/build/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Images cache
+backend/static/images/*.jpg
+backend/static/images/*.png
+backend/static/images/*.webp
+!backend/static/images/.gitkeep
