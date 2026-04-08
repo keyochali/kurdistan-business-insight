@@ -282,6 +282,7 @@ export default function AdminPage() {
     if (localStorage.getItem("kbi_admin_authed") === "true") setAuthed(true);
   }, []);
 
+  // Load profiles/companies from data.json (source of truth)
   useEffect(() => {
     if (!authed) return;
     (async () => {
@@ -289,12 +290,8 @@ export default function AdminPage() {
         const res = await fetch("/data.json");
         if (res.ok) {
           const data = await res.json();
-          const localP = JSON.parse(localStorage.getItem("kbi_local_profiles") || "[]");
-          const localC = JSON.parse(localStorage.getItem("kbi_local_companies") || "[]");
-          const removedP = new Set(JSON.parse(localStorage.getItem("kbi_removed_profiles") || "[]"));
-          const removedC = new Set(JSON.parse(localStorage.getItem("kbi_removed_companies") || "[]"));
-          setProfiles([...(data.profiles || []).filter((p) => !removedP.has(p.linkedin_url)), ...localP]);
-          setCompanies([...(data.companies || []).filter((c) => !removedC.has(c.linkedin_url)), ...localC]);
+          setProfiles(data.profiles || []);
+          setCompanies(data.companies || []);
         }
       } catch {}
     })();
@@ -347,37 +344,48 @@ export default function AdminPage() {
     } else { setLoginError("Incorrect password."); }
   };
 
+  // Persist changes to GitHub repo via serverless function
+  const [saving, setSaving] = useState(false);
+
+  const saveToRepo = async (newProfiles, newCompanies) => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/update-entities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: ADMIN_PASSWORD, profiles: newProfiles, companies: newCompanies }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showMsg("Saved! Changes will appear on the site shortly.", "success");
+      } else {
+        showMsg(data.error || "Failed to save", "error");
+      }
+    } catch (e) {
+      showMsg(`Save error: ${e.message}`, "error");
+    }
+    setSaving(false);
+  };
+
   const handleAddProfile = (data) => {
-    const local = JSON.parse(localStorage.getItem("kbi_local_profiles") || "[]");
-    local.push(data);
-    localStorage.setItem("kbi_local_profiles", JSON.stringify(local));
-    setProfiles([...profiles, data]);
-    showMsg(`Added: ${data.name}`, "success");
+    const updated = [...profiles, data];
+    setProfiles(updated);
+    saveToRepo(updated, companies);
   };
   const handleRemoveProfile = (item) => {
-    const local = JSON.parse(localStorage.getItem("kbi_local_profiles") || "[]");
-    localStorage.setItem("kbi_local_profiles", JSON.stringify(local.filter((p) => p.linkedin_url !== item.linkedin_url)));
-    const removed = JSON.parse(localStorage.getItem("kbi_removed_profiles") || "[]");
-    if (!removed.includes(item.linkedin_url)) removed.push(item.linkedin_url);
-    localStorage.setItem("kbi_removed_profiles", JSON.stringify(removed));
-    setProfiles(profiles.filter((p) => p.linkedin_url !== item.linkedin_url));
-    showMsg(`Removed: ${item.name}`, "success");
+    const updated = profiles.filter((p) => p.linkedin_url !== item.linkedin_url);
+    setProfiles(updated);
+    saveToRepo(updated, companies);
   };
   const handleAddCompany = (data) => {
-    const local = JSON.parse(localStorage.getItem("kbi_local_companies") || "[]");
-    local.push(data);
-    localStorage.setItem("kbi_local_companies", JSON.stringify(local));
-    setCompanies([...companies, data]);
-    showMsg(`Added: ${data.name}`, "success");
+    const updated = [...companies, data];
+    setCompanies(updated);
+    saveToRepo(profiles, updated);
   };
   const handleRemoveCompany = (item) => {
-    const local = JSON.parse(localStorage.getItem("kbi_local_companies") || "[]");
-    localStorage.setItem("kbi_local_companies", JSON.stringify(local.filter((c) => c.linkedin_url !== item.linkedin_url)));
-    const removed = JSON.parse(localStorage.getItem("kbi_removed_companies") || "[]");
-    if (!removed.includes(item.linkedin_url)) removed.push(item.linkedin_url);
-    localStorage.setItem("kbi_removed_companies", JSON.stringify(removed));
-    setCompanies(companies.filter((c) => c.linkedin_url !== item.linkedin_url));
-    showMsg(`Removed: ${item.name}`, "success");
+    const updated = companies.filter((c) => c.linkedin_url !== item.linkedin_url);
+    setCompanies(updated);
+    saveToRepo(profiles, updated);
   };
 
   const triggerPipeline = async (mode) => {
@@ -466,6 +474,13 @@ export default function AdminPage() {
             </div>
           </button>
         </div>
+
+        {/* Saving indicator */}
+        {saving && (
+          <div className="mb-4 flex items-center gap-2 text-xs text-neutral-400">
+            <Loader2 size={12} className="animate-spin" /> Saving to server...
+          </div>
+        )}
 
         {/* Entity management */}
         <div className="space-y-6">
