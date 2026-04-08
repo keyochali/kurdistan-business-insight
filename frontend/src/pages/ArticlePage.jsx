@@ -236,7 +236,7 @@ export default function ArticlePage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="max-w-3xl mx-auto px-6 py-12"
+        className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12"
       >
         {/* Back link */}
         <Link

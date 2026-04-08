@@ -47,7 +47,7 @@ export default function HomePage() {
   }, [page, selectedCategory, search]);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <Helmet>
         <title>Kurdistan Business Insight — Daily Business News</title>
         <meta name="description" content="Daily curated business news from Kurdistan Region's most influential leaders and companies." />
@@ -58,7 +58,7 @@ export default function HomePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="mb-14"
+        className="mb-8 sm:mb-14"
       >
         {search ? (
           <div>
@@ -75,7 +75,7 @@ export default function HomePage() {
               <p className="text-xs font-medium tracking-widest uppercase text-accent-500 mb-3">
                 Daily Intelligence
               </p>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-neutral-900 leading-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-neutral-900 leading-tight">
                 Today's Business
                 <br />
                 <span className="text-neutral-400">Briefing</span>
@@ -83,7 +83,7 @@ export default function HomePage() {
             </div>
 
             {/* Stats */}
-            <div className="flex gap-8 pb-1">
+            <div className="flex gap-4 sm:gap-8 pb-1">
               <div className="flex items-center gap-2.5 text-neutral-400">
                 <Newspaper size={16} strokeWidth={1.5} />
                 <span className="text-sm">

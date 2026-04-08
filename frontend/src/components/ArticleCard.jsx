@@ -47,7 +47,7 @@ export default function ArticleCard({ article, featured = false, index = 0 }) {
               </div>
 
               {/* Content */}
-              <div className="md:w-1/2 p-8 md:p-10 flex flex-col justify-center">
+              <div className="md:w-1/2 p-5 sm:p-8 md:p-10 flex flex-col justify-center">
                 <div className="flex items-center gap-3 mb-4">
                   {category && (
                     <span className={`px-3 py-1 text-[10px] font-semibold uppercase tracking-widest rounded-full ${getCategoryBadgeStyle(category)}`}>
