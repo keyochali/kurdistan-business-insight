@@ -4,6 +4,7 @@ import {
   Plus, Trash2, RefreshCw, Download, Users, Building2, X,
   Loader2, CheckCircle2, AlertCircle, Circle, Clock, ExternalLink,
 } from "lucide-react";
+import { fetchProfiles, fetchCompanies } from "../utils/api";
 
 const ADMIN_PASSWORD = "789yesNo789";
 
