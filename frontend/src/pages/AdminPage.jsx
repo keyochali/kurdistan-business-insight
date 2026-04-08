@@ -282,18 +282,17 @@ export default function AdminPage() {
     if (localStorage.getItem("kbi_admin_authed") === "true") setAuthed(true);
   }, []);
 
-  // Load profiles/companies from data.json (source of truth)
+  // Load profiles/companies from Supabase (source of truth)
   useEffect(() => {
     if (!authed) return;
     (async () => {
       try {
-        const res = await fetch("/data.json");
-        if (res.ok) {
-          const data = await res.json();
-          setProfiles(data.profiles || []);
-          setCompanies(data.companies || []);
-        }
-      } catch {}
+        const [p, c] = await Promise.all([fetchProfiles(), fetchCompanies()]);
+        setProfiles(p);
+        setCompanies(c);
+      } catch (e) {
+        showMsg("Failed to load from database", "error");
+      }
     })();
   }, [authed]);
 
@@ -347,45 +346,54 @@ export default function AdminPage() {
   // Persist changes to GitHub repo via serverless function
   const [saving, setSaving] = useState(false);
 
-  const saveToRepo = async (newProfiles, newCompanies) => {
+  const dbAction = async (action, table, data = null, id = null) => {
     setSaving(true);
     try {
       const res = await fetch("/api/update-entities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: ADMIN_PASSWORD, profiles: newProfiles, companies: newCompanies }),
+        body: JSON.stringify({ password: ADMIN_PASSWORD, action, table, data, id }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        showMsg("Saved! Changes will appear on the site shortly.", "success");
-      } else {
-        showMsg(data.error || "Failed to save", "error");
-      }
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed");
+      return result;
     } catch (e) {
-      showMsg(`Save error: ${e.message}`, "error");
+      showMsg(e.message, "error");
+      return null;
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
-  const handleAddProfile = (data) => {
-    const updated = [...profiles, data];
-    setProfiles(updated);
-    saveToRepo(updated, companies);
+  const handleAddProfile = async (data) => {
+    const result = await dbAction("add", "linkedin_profiles", { name: data.name, linkedin_url: data.linkedin_url, is_active: true });
+    if (result?.success) {
+      const added = result.data?.[0] || { ...data, id: Date.now() };
+      setProfiles([...profiles, added]);
+      showMsg(`Added: ${data.name}`, "success");
+    }
   };
-  const handleRemoveProfile = (item) => {
-    const updated = profiles.filter((p) => p.linkedin_url !== item.linkedin_url);
-    setProfiles(updated);
-    saveToRepo(updated, companies);
+  const handleRemoveProfile = async (item) => {
+    const result = await dbAction("remove", "linkedin_profiles", null, item.id);
+    if (result?.success) {
+      setProfiles(profiles.filter((p) => p.id !== item.id));
+      showMsg(`Removed: ${item.name}`, "success");
+    }
   };
-  const handleAddCompany = (data) => {
-    const updated = [...companies, data];
-    setCompanies(updated);
-    saveToRepo(profiles, updated);
+  const handleAddCompany = async (data) => {
+    const result = await dbAction("add", "linkedin_companies", { name: data.name, linkedin_url: data.linkedin_url, is_active: true });
+    if (result?.success) {
+      const added = result.data?.[0] || { ...data, id: Date.now() };
+      setCompanies([...companies, added]);
+      showMsg(`Added: ${data.name}`, "success");
+    }
   };
-  const handleRemoveCompany = (item) => {
-    const updated = companies.filter((c) => c.linkedin_url !== item.linkedin_url);
-    setCompanies(updated);
-    saveToRepo(profiles, updated);
+  const handleRemoveCompany = async (item) => {
+    const result = await dbAction("remove", "linkedin_companies", null, item.id);
+    if (result?.success) {
+      setCompanies(companies.filter((c) => c.id !== item.id));
+      showMsg(`Removed: ${item.name}`, "success");
+    }
   };
 
   const triggerPipeline = async (mode) => {
