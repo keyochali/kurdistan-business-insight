@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Plus, Trash2, RefreshCw, Download, Users, Building2, X,
-  Loader2, CheckCircle2, AlertCircle, Play,
+  Loader2, CheckCircle2, AlertCircle,
 } from "lucide-react";
 
 const ADMIN_PASSWORD = "789yesNo789";
-const GITHUB_REPO = "keyochali/kurdistan-business-insight";
-const GITHUB_WORKFLOW = "pipeline.yml";
 
 function AdminLogin({ onLogin, error }) {
   const [key, setKey] = useState("");
@@ -66,21 +64,11 @@ function EntityTable({ title, icon: Icon, items, onAdd, onRemove }) {
 
       {showAdd && (
         <div className="px-6 py-4 border-b border-neutral-100 bg-neutral-50 flex flex-col sm:flex-row gap-3">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Name"
-            className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-accent-400"
-          />
-          <input
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="LinkedIn URL"
-            className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-accent-400"
-          />
-          <button onClick={handleAdd} className="px-4 py-2 bg-accent-400 text-white text-sm font-medium rounded-lg hover:bg-accent-500 transition-colors">
-            Save
-          </button>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name"
+            className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-accent-400" />
+          <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="LinkedIn URL"
+            className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-accent-400" />
+          <button onClick={handleAdd} className="px-4 py-2 bg-accent-400 text-white text-sm font-medium rounded-lg hover:bg-accent-500 transition-colors">Save</button>
         </div>
       )}
 
@@ -102,84 +90,40 @@ function EntityTable({ title, icon: Icon, items, onAdd, onRemove }) {
   );
 }
 
-// GitHub token input component
-function GitHubTokenInput({ token, setToken }) {
-  const [editing, setEditing] = useState(!token);
-  const [val, setVal] = useState(token);
-
-  const save = () => {
-    localStorage.setItem("kbi_gh_token", val);
-    setToken(val);
-    setEditing(false);
-  };
-
-  if (!editing && token) {
-    return (
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-green-600 font-medium">Token saved</span>
-        <button onClick={() => setEditing(true)} className="text-xs text-neutral-400 hover:text-neutral-600">Change</button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex gap-2 mt-2">
-      <input
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-        placeholder="ghp_xxxxxxxxxxxx"
-        type="password"
-        className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg text-xs font-mono focus:outline-none focus:border-accent-400"
-      />
-      <button onClick={save} className="px-3 py-2 bg-neutral-900 text-white text-xs rounded-lg hover:bg-neutral-800 transition-colors">
-        Save
-      </button>
-    </div>
-  );
-}
-
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [loginError, setLoginError] = useState("");
-  const [ghToken, setGhToken] = useState(() => localStorage.getItem("kbi_gh_token") || "");
   const [profiles, setProfiles] = useState([]);
   const [companies, setCompanies] = useState([]);
-  const [pipelineStatus, setPipelineStatus] = useState(null); // null | 'triggering' | 'running' | 'completed' | 'failed'
+  const [pipelineStatus, setPipelineStatus] = useState(null);
   const [message, setMessage] = useState({ text: "", type: "info" });
 
   useEffect(() => {
     if (localStorage.getItem("kbi_admin_authed") === "true") setAuthed(true);
   }, []);
 
-  // Load profiles/companies from data.json + localStorage overrides
+  // Load data
   useEffect(() => {
     if (!authed) return;
-    async function load() {
+    (async () => {
       try {
         const res = await fetch("/data.json");
         if (res.ok) {
           const data = await res.json();
-          const localProfiles = JSON.parse(localStorage.getItem("kbi_local_profiles") || "[]");
-          const localCompanies = JSON.parse(localStorage.getItem("kbi_local_companies") || "[]");
+          const localP = JSON.parse(localStorage.getItem("kbi_local_profiles") || "[]");
+          const localC = JSON.parse(localStorage.getItem("kbi_local_companies") || "[]");
           const removedP = new Set(JSON.parse(localStorage.getItem("kbi_removed_profiles") || "[]"));
           const removedC = new Set(JSON.parse(localStorage.getItem("kbi_removed_companies") || "[]"));
-          setProfiles([
-            ...(data.profiles || []).filter((p) => !removedP.has(p.linkedin_url)),
-            ...localProfiles,
-          ]);
-          setCompanies([
-            ...(data.companies || []).filter((c) => !removedC.has(c.linkedin_url)),
-            ...localCompanies,
-          ]);
+          setProfiles([...(data.profiles || []).filter((p) => !removedP.has(p.linkedin_url)), ...localP]);
+          setCompanies([...(data.companies || []).filter((c) => !removedC.has(c.linkedin_url)), ...localC]);
         }
       } catch {}
-    }
-    load();
+    })();
   }, [authed]);
 
   const showMsg = (text, type = "info") => {
     setMessage({ text, type });
-    setTimeout(() => setMessage({ text: "", type: "info" }), 6000);
+    setTimeout(() => setMessage({ text: "", type: "info" }), 8000);
   };
 
   const handleLogin = (key) => {
@@ -191,23 +135,21 @@ export default function AdminPage() {
     }
   };
 
-  // Profile/Company CRUD via localStorage
+  // Profile/Company CRUD
   const handleAddProfile = (data) => {
     const local = JSON.parse(localStorage.getItem("kbi_local_profiles") || "[]");
     local.push(data);
     localStorage.setItem("kbi_local_profiles", JSON.stringify(local));
     setProfiles([...profiles, data]);
-    showMsg(`Added: ${data.name}. Will be included in the next pipeline run.`, "success");
+    showMsg(`Added: ${data.name}`, "success");
   };
 
   const handleRemoveProfile = (item) => {
     const local = JSON.parse(localStorage.getItem("kbi_local_profiles") || "[]");
     localStorage.setItem("kbi_local_profiles", JSON.stringify(local.filter((p) => p.linkedin_url !== item.linkedin_url)));
     const removed = JSON.parse(localStorage.getItem("kbi_removed_profiles") || "[]");
-    if (!removed.includes(item.linkedin_url)) {
-      removed.push(item.linkedin_url);
-      localStorage.setItem("kbi_removed_profiles", JSON.stringify(removed));
-    }
+    if (!removed.includes(item.linkedin_url)) removed.push(item.linkedin_url);
+    localStorage.setItem("kbi_removed_profiles", JSON.stringify(removed));
     setProfiles(profiles.filter((p) => p.linkedin_url !== item.linkedin_url));
     showMsg(`Removed: ${item.name}`, "success");
   };
@@ -217,60 +159,42 @@ export default function AdminPage() {
     local.push(data);
     localStorage.setItem("kbi_local_companies", JSON.stringify(local));
     setCompanies([...companies, data]);
-    showMsg(`Added: ${data.name}. Will be included in the next pipeline run.`, "success");
+    showMsg(`Added: ${data.name}`, "success");
   };
 
   const handleRemoveCompany = (item) => {
     const local = JSON.parse(localStorage.getItem("kbi_local_companies") || "[]");
     localStorage.setItem("kbi_local_companies", JSON.stringify(local.filter((c) => c.linkedin_url !== item.linkedin_url)));
     const removed = JSON.parse(localStorage.getItem("kbi_removed_companies") || "[]");
-    if (!removed.includes(item.linkedin_url)) {
-      removed.push(item.linkedin_url);
-      localStorage.setItem("kbi_removed_companies", JSON.stringify(removed));
-    }
+    if (!removed.includes(item.linkedin_url)) removed.push(item.linkedin_url);
+    localStorage.setItem("kbi_removed_companies", JSON.stringify(removed));
     setCompanies(companies.filter((c) => c.linkedin_url !== item.linkedin_url));
     showMsg(`Removed: ${item.name}`, "success");
   };
 
-  // Trigger GitHub Actions pipeline
+  // Pipeline triggers — calls Vercel serverless API (no local backend needed)
   const triggerPipeline = async (mode) => {
-    if (!ghToken) {
-      showMsg("Please add your GitHub token first (needs 'repo' and 'workflow' permissions).", "error");
-      return;
-    }
-
     setPipelineStatus("triggering");
     try {
-      const res = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/${GITHUB_WORKFLOW}/dispatches`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${ghToken}`,
-            Accept: "application/vnd.github.v3+json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ref: "master",
-            inputs: { mode },
-          }),
-        }
-      );
+      const res = await fetch("/api/trigger-pipeline", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: ADMIN_PASSWORD, mode }),
+      });
+      const data = await res.json();
 
-      if (res.status === 204) {
+      if (res.ok) {
         setPipelineStatus("running");
         showMsg(
           mode === "scrape"
-            ? "Pipeline triggered! Scraping and generating articles. This takes ~20 min. The site will auto-update when done."
-            : "Re-generation triggered! Rewriting articles from cached data. The site will auto-update when done.",
+            ? "Pipeline started! Scraping posts and generating articles. This takes ~20 minutes. The site auto-updates when done."
+            : "Re-generation started! Rewriting articles. The site auto-updates when done.",
           "success"
         );
-        // Poll for completion
-        pollWorkflowStatus();
+        pollStatus();
       } else {
-        const err = await res.json().catch(() => ({}));
         setPipelineStatus("failed");
-        showMsg(`Failed to trigger: ${err.message || res.statusText}`, "error");
+        showMsg(data.error || "Failed to trigger pipeline", "error");
       }
     } catch (e) {
       setPipelineStatus("failed");
@@ -278,41 +202,28 @@ export default function AdminPage() {
     }
   };
 
-  const pollWorkflowStatus = () => {
+  const pollStatus = () => {
     let attempts = 0;
-    const maxAttempts = 120; // 10 minutes of polling
-
-    const poll = setInterval(async () => {
+    const interval = setInterval(async () => {
       attempts++;
-      if (attempts > maxAttempts) {
-        clearInterval(poll);
-        setPipelineStatus(null);
-        return;
-      }
-
+      if (attempts > 150) { clearInterval(interval); setPipelineStatus(null); return; }
       try {
-        const res = await fetch(
-          `https://api.github.com/repos/${GITHUB_REPO}/actions/runs?per_page=1`,
-          { headers: { Authorization: `Bearer ${ghToken}`, Accept: "application/vnd.github.v3+json" } }
-        );
+        const res = await fetch("/api/pipeline-status");
         if (res.ok) {
           const data = await res.json();
-          const run = data.workflow_runs?.[0];
-          if (run) {
-            if (run.status === "completed") {
-              clearInterval(poll);
-              setPipelineStatus(run.conclusion === "success" ? "completed" : "failed");
-              showMsg(
-                run.conclusion === "success"
-                  ? "Pipeline completed! Refresh the homepage to see new articles."
-                  : `Pipeline finished with status: ${run.conclusion}`,
-                run.conclusion === "success" ? "success" : "error"
-              );
-            }
+          if (data.status === "completed") {
+            clearInterval(interval);
+            setPipelineStatus(data.conclusion === "success" ? "completed" : "failed");
+            showMsg(
+              data.conclusion === "success"
+                ? "Done! Articles updated. Refresh the homepage to see them."
+                : `Pipeline finished: ${data.conclusion}`,
+              data.conclusion === "success" ? "success" : "error"
+            );
           }
         }
       } catch {}
-    }, 5000);
+    }, 8000);
   };
 
   if (!authed) return <AdminLogin onLogin={handleLogin} error={loginError} />;
@@ -325,41 +236,22 @@ export default function AdminPage() {
             <p className="text-xs font-medium tracking-widest uppercase text-accent-500 mb-2">Admin</p>
             <h2 className="text-3xl font-serif font-bold text-neutral-900">Content Manager</h2>
           </div>
-          <button onClick={() => { localStorage.removeItem("kbi_admin_authed"); setAuthed(false); }} className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors">
-            Logout
-          </button>
+          <button onClick={() => { localStorage.removeItem("kbi_admin_authed"); setAuthed(false); }}
+            className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors">Logout</button>
         </div>
 
         {/* Message */}
         {message.text && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
             className={`mb-6 px-4 py-3 rounded-lg text-sm flex items-center gap-2 ${
               message.type === "success" ? "bg-green-50 border border-green-200 text-green-700" :
               message.type === "error" ? "bg-red-50 border border-red-200 text-red-700" :
               "bg-accent-50 border border-accent-200 text-accent-700"
-            }`}
-          >
+            }`}>
             {message.type === "success" ? <CheckCircle2 size={14} /> : message.type === "error" ? <AlertCircle size={14} /> : null}
             {message.text}
           </motion.div>
         )}
-
-        {/* GitHub token setup */}
-        <div className="mb-6 p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
-              GitHub Connection
-            </span>
-            <GitHubTokenInput token={ghToken} setToken={setGhToken} />
-          </div>
-          {!ghToken && (
-            <p className="text-xs text-neutral-400 mt-2">
-              Create a token at github.com/settings/tokens with <code className="px-1 py-0.5 bg-neutral-200 rounded text-[11px]">repo</code> scope.
-            </p>
-          )}
-        </div>
 
         {/* Pipeline actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
@@ -378,8 +270,8 @@ export default function AdminPage() {
             <div>
               <p className="text-sm font-semibold">Scrape & Generate</p>
               <p className="text-xs text-neutral-400">
-                {pipelineStatus === "running" ? "Running... (~20 min)" :
-                 pipelineStatus === "triggering" ? "Triggering..." :
+                {pipelineStatus === "triggering" ? "Starting..." :
+                 pipelineStatus === "running" ? "Running... (~20 min)" :
                  pipelineStatus === "completed" ? "Done! Refresh homepage." :
                  "Fetch new posts and create articles"}
               </p>
@@ -391,11 +283,7 @@ export default function AdminPage() {
             disabled={pipelineStatus === "running" || pipelineStatus === "triggering"}
             className="flex items-center gap-3 px-6 py-5 bg-white border border-neutral-200 text-neutral-900 rounded-xl hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-left"
           >
-            {pipelineStatus === "running" || pipelineStatus === "triggering" ? (
-              <Loader2 size={20} className="animate-spin flex-shrink-0" />
-            ) : (
-              <RefreshCw size={20} className="flex-shrink-0" />
-            )}
+            <RefreshCw size={20} className="flex-shrink-0" />
             <div>
               <p className="text-sm font-semibold">Re-generate</p>
               <p className="text-xs text-neutral-400">Rewrite articles from cached posts</p>
@@ -408,10 +296,6 @@ export default function AdminPage() {
           <EntityTable title="Tracked Profiles" icon={Users} items={profiles} onAdd={handleAddProfile} onRemove={handleRemoveProfile} />
           <EntityTable title="Tracked Companies" icon={Building2} items={companies} onAdd={handleAddCompany} onRemove={handleRemoveCompany} />
         </div>
-
-        <p className="text-xs text-neutral-400 mt-8 text-center">
-          Profile/company changes are saved locally. Pipeline runs via GitHub Actions — articles auto-deploy to the site.
-        </p>
       </motion.div>
     </div>
   );

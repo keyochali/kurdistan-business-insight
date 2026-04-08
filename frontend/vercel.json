@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/((?!data\\.json|meta\\.json|sitemap\\.xml|robots\\.txt|static|favicon|manifest).*)", "destination": "/index.html" }
+    { "source": "/api/:path*", "destination": "/api/:path*" },
+    { "source": "/((?!data\\.json|meta\\.json|sitemap\\.xml|robots\\.txt|static|favicon|manifest|api).*)", "destination": "/index.html" }
   ],
   "headers": [
     {

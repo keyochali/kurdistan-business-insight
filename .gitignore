@@ -29,3 +29,5 @@ backend/static/images/*.jpg
 backend/static/images/*.png
 backend/static/images/*.webp
 !backend/static/images/.gitkeep
+
+.vercel
