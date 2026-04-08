@@ -1,0 +1,138 @@
+name: Run Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Pipeline mode'
+        required: true
+        default: 'scrape'
+        type: choice
+        options:
+          - scrape
+          - regenerate
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r backend/requirements.txt
+          pip install markdown psycopg2-binary
+
+      - name: Set up environment
+        run: |
+          cat > .env << EOF
+          APIFY_API_TOKEN=${{ secrets.APIFY_API_TOKEN }}
+          ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
+          DATABASE_URL=sqlite:///./data/newsletter.db
+          APP_ENV=production
+          DAILY_ARTICLE_COUNT=20
+          TIMEZONE=Asia/Baghdad
+          EOF
+
+      - name: Initialize database
+        run: |
+          python -c "
+          from backend.database.connection import init_db
+          init_db()
+          print('DB initialized')
+          "
+
+      - name: Seed profiles and companies
+        run: |
+          python -c "
+          import json
+          from backend.database.connection import SessionLocal, init_db
+          from backend.database.models import LinkedInProfile, LinkedInCompany
+          init_db()
+          db = SessionLocal()
+          with open('data/profiles.json') as f:
+              for p in json.load(f):
+                  if not db.query(LinkedInProfile).filter_by(linkedin_url=p['url']).first():
+                      db.add(LinkedInProfile(name=p['name'], linkedin_url=p['url']))
+          with open('data/companies.json') as f:
+              for c in json.load(f):
+                  if not db.query(LinkedInCompany).filter_by(linkedin_url=c['url']).first():
+                      db.add(LinkedInCompany(name=c['name'], linkedin_url=c['url']))
+          db.commit()
+          db.close()
+          print('Seeded profiles and companies')
+          "
+
+      - name: Run pipeline
+        run: python run_pipeline.py
+        timeout-minutes: 35
+
+      - name: Inject inline images
+        run: python inject_images.py || true
+
+      - name: Fix image paths
+        run: python fix_paths.py || true
+
+      - name: Export data.json for frontend
+        run: |
+          python -c "
+          import json, sqlite3, re
+          conn = sqlite3.connect('data/newsletter.db')
+          conn.row_factory = sqlite3.Row
+
+          articles = []
+          for r in conn.execute('SELECT * FROM articles WHERE is_published=1 ORDER BY rank').fetchall():
+              tags = r['tags']
+              if isinstance(tags, str):
+                  try: tags = json.loads(tags)
+                  except: tags = []
+              html = r['body_html'] or ''
+              html = re.sub(r'<figure class=\"article-inline-image\"[^>]*>.*?</figure>', '', html, flags=re.DOTALL)
+              images = []
+              for img in conn.execute('SELECT image_url, local_path, is_featured FROM article_images WHERE article_id=?', (r['id'],)).fetchall():
+                  images.append({'image_url': img['image_url'], 'local_path': img['local_path'], 'is_featured': bool(img['is_featured'])})
+              articles.append({
+                  'id': r['id'], 'slug': r['slug'], 'headline': r['headline'],
+                  'subheadline': r['subheadline'], 'summary': r['summary'],
+                  'body_html': html, 'body_markdown': r['body_markdown'],
+                  'category': r['category'], 'tags': tags,
+                  'featured_image_url': r['featured_image_url'],
+                  'featured_image_local': r['featured_image_local'],
+                  'author_attribution': r['author_attribution'],
+                  'publish_date': r['publish_date'], 'is_published': True,
+                  'reading_time_minutes': r['reading_time_minutes'],
+                  'rank': r['rank'], 'images': images,
+              })
+
+          sources = []
+          try:
+              with open('data/source_profiles.json') as f: sources = json.load(f)
+          except: pass
+
+          profiles = [dict(r) for r in conn.execute('SELECT id, name, linkedin_url, is_active FROM linkedin_profiles').fetchall()]
+          companies = [dict(r) for r in conn.execute('SELECT id, name, linkedin_url, is_active FROM linkedin_companies').fetchall()]
+          conn.close()
+
+          with open('frontend/public/data.json', 'w') as f:
+              json.dump({'articles': articles, 'sources': sources, 'profiles': profiles, 'companies': companies}, f)
+          print(f'Exported {len(articles)} articles')
+          "
+
+      - name: Generate SEO files
+        run: python generate_seo.py
+
+      - name: Commit and push updated data
+        run: |
+          git config user.name "KBI Pipeline Bot"
+          git config user.email "bot@kurdistanbusinessinsight.com"
+          git add frontend/public/data.json frontend/public/sitemap.xml frontend/public/robots.txt frontend/public/meta.json data/profiles.json data/companies.json data/source_profiles.json
+          git diff --cached --quiet || git commit -m "Update articles $(date +%Y-%m-%d)"
+          git push

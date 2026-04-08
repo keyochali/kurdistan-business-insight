@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Calendar } from "lucide-react";
 import ArticleCard from "../components/ArticleCard";
@@ -35,6 +36,10 @@ export default function ArchivePage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
+      <Helmet>
+        <title>Archive — Kurdistan Business Insight</title>
+        <meta name="description" content="Browse past editions of Kurdistan Business Insight — daily business news from Kurdistan Region." />
+      </Helmet>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

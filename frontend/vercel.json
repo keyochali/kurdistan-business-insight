@@ -1,12 +1,18 @@
 {
   "rewrites": [
-    { "source": "/((?!data\\.json|static|favicon|manifest).*)", "destination": "/index.html" }
+    { "source": "/((?!data\\.json|meta\\.json|sitemap\\.xml|robots\\.txt|static|favicon|manifest).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
       "source": "/data.json",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=300, s-maxage=300" }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Content-Type", "value": "application/xml" }
       ]
     },
     {

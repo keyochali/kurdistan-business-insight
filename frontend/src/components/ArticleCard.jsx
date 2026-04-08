@@ -19,9 +19,7 @@ export default function ArticleCard({ article, featured = false, index = 0 }) {
     reading_time_minutes,
   } = article;
 
-  const imageUrl = featured_image_local
-    ? `${process.env.REACT_APP_API_URL || "http://localhost:8000"}/static/${featured_image_local}`
-    : featured_image_url;
+  const imageUrl = featured_image_url || null;
 
   if (featured) {
     return (

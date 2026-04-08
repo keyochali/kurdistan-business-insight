@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Newspaper, TrendingUp, Users } from "lucide-react";
-/* eslint-disable no-unused-vars */
 import ArticleList from "../components/ArticleList";
 import CategoryFilter from "../components/CategoryFilter";
 import { fetchArticles, fetchCategories } from "../utils/api";
@@ -48,6 +48,11 @@ export default function HomePage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
+      <Helmet>
+        <title>Kurdistan Business Insight — Daily Business News</title>
+        <meta name="description" content="Daily curated business news from Kurdistan Region's most influential leaders and companies." />
+        <link rel="canonical" href="https://frontend-eight-azure-29.vercel.app" />
+      </Helmet>
       {/* Hero */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}

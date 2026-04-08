@@ -8,21 +8,14 @@ let _cachedData = null;
 async function loadData() {
   if (_cachedData) return _cachedData;
 
-  try {
-    const res = await fetch("/data.json");
-    if (res.ok) {
-      _cachedData = await res.json();
-      return _cachedData;
-    }
-  } catch (e) {
-    // data.json not available — fall back to API
+  const res = await fetch("/data.json");
+  if (res.ok) {
+    _cachedData = await res.json();
+    return _cachedData;
   }
 
-  // Fallback: local FastAPI backend
-  const API = process.env.REACT_APP_API_URL || "http://localhost:8000";
-  const res = await fetch(`${API}/api/articles/`);
-  const d = await res.json();
-  return { articles: d.items, sources: [], profiles: [], companies: [] };
+  // No data available
+  return { articles: [], sources: [], profiles: [], companies: [] };
 }
 
 function matchSources(article, sources) {

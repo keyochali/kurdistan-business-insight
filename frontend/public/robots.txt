@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+Sitemap: https://frontend-eight-azure-29.vercel.app/sitemap.xml

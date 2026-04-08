@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Clock, Calendar, X, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { fetchArticle } from "../utils/api";
 import { getCategoryBadgeStyle } from "../components/CategoryFilter";
 import SourceBadge from "../components/SourceBadge";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const SITE_URL = "https://frontend-eight-azure-29.vercel.app";
+
+const API_URL = process.env.REACT_APP_API_URL || "";
 const MAX_GALLERY_IMAGES = 8;
 
 function resolveImageUrl(img) {
-  if (img.local_path) return `${API_URL}/static/${img.local_path}`;
   if (img.image_url) return img.image_url;
   return null;
 }
@@ -121,9 +123,7 @@ export default function ArticlePage() {
   const allImages = useMemo(() => {
     if (!article) return [];
 
-    const featured = article.featured_image_local
-      ? `${API_URL}/static/${article.featured_image_local}`
-      : article.featured_image_url;
+    const featured = article.featured_image_url || null;
 
     const seen = new Set();
     const images = [];
@@ -196,8 +196,42 @@ export default function ArticlePage() {
 
   const featuredUrl = allImages[0] || null;
 
+  const articleUrl = `${SITE_URL}/article/${slug}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.headline,
+    description: article.summary || article.subheadline || "",
+    image: article.featured_image_url || undefined,
+    datePublished: article.publish_date,
+    author: {
+      "@type": "Organization",
+      name: "Kurdistan Business Insight",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Kurdistan Business Insight",
+    },
+    mainEntityOfPage: articleUrl,
+  };
+
   return (
     <>
+      <Helmet>
+        <title>{article.headline} — Kurdistan Business Insight</title>
+        <meta name="description" content={(article.summary || article.subheadline || "").slice(0, 160)} />
+        <link rel="canonical" href={articleUrl} />
+        <meta property="og:title" content={article.headline} />
+        <meta property="og:description" content={(article.summary || "").slice(0, 200)} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={articleUrl} />
+        {article.featured_image_url && <meta property="og:image" content={article.featured_image_url} />}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={article.headline} />
+        <meta name="twitter:description" content={(article.summary || "").slice(0, 200)} />
+        {article.featured_image_url && <meta name="twitter:image" content={article.featured_image_url} />}
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
       <motion.article
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
