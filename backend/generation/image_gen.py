@@ -64,11 +64,16 @@ def get_source_colors(sources: list[dict]) -> list[str]:
 
 
 def build_color_prompt(colors: list[str]) -> str:
-    """Build a color directive for the image prompt."""
+    """Build a strong color directive for the image prompt."""
     if not colors:
-        return "Color palette: black, white, and warm gold (#C8A960) accents. "
-    hex_list = ", ".join(colors)
-    return f"Color palette inspired by these brand colors: {hex_list}. Use these as the primary accent colors alongside black and white. "
+        return "The dominant colors must be black, white, and warm gold (#C8A960). "
+    hex_list = ", ".join(colors[:4])
+    return (
+        f"IMPORTANT COLOR REQUIREMENT: The illustration MUST prominently feature "
+        f"these exact brand colors as the dominant palette: {hex_list}. "
+        f"These colors should be the most visible colors in the entire image. "
+        f"Use them for backgrounds, shapes, gradients, and key visual elements. "
+    )
 
 
 def generate_article_image(
