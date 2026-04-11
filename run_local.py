@@ -126,6 +126,11 @@ def push_articles_to_supabase(db):
     articles = db.query(Article).filter(Article.is_published == True).all()
     logger.info(f"Pushing {len(articles)} articles to Supabase...")
 
+    # Clear old articles from Supabase first
+    supa_delete("article_images", "id=gt.0")
+    supa_delete("articles", "id=gt.0")
+    logger.info("Cleared old articles from Supabase")
+
     for article in articles:
         tags = article.tags
         if isinstance(tags, str):
@@ -307,6 +312,19 @@ def main():
                 logger.warning("No posts found!")
                 return
 
+            # Deduplicate posts by ID before storing
+            seen_ids = set()
+            unique_posts = []
+            for post in todays_posts:
+                pid = post.get("postId")
+                if pid and pid not in seen_ids:
+                    seen_ids.add(pid)
+                    unique_posts.append(post)
+                elif not pid:
+                    unique_posts.append(post)
+            todays_posts = unique_posts
+            logger.info(f"Deduplicated to {len(todays_posts)} unique posts")
+
             # Store posts
             stored_posts = []
             for post in todays_posts:
@@ -324,10 +342,15 @@ def main():
                     try: posted_at_val = datetime.fromisoformat(posted_at_val)
                     except: posted_at_val = None
 
+                # Skip duplicates
+                post_id = post.get("postId")
+                if post_id and db.query(RawPost).filter_by(linkedin_post_id=post_id).first():
+                    continue
+
                 raw_post = RawPost(
                     profile_id=profile.id if profile else None,
                     company_id=company.id if company else None,
-                    linkedin_post_id=post.get("postId"),
+                    linkedin_post_id=post_id,
                     post_url=post.get("postUrl"),
                     author_name=author_name,
                     author_headline=post.get("authorHeadline", ""),
@@ -407,13 +430,46 @@ def main():
         logger.info("Deduplicating...")
         selections = deduplicate_selections(selections, valid_labeled, embedder)
         if recent: selections = deduplicate_against_published(selections, db, embedder, days=7)
-        logger.info(f"Final: {len(selections)} unique articles")
+        logger.info(f"After dedup: {len(selections)} unique selections")
+
+        # If dedup removed too many, select more from remaining candidates
+        target = 20
+        if len(selections) < target:
+            used_ids = set()
+            for s in selections:
+                used_ids.update(s.get("post_ids", []))
+            remaining = [lp for i, lp in enumerate(valid_labeled) if i not in used_ids]
+            if remaining:
+                extra = selector.select_articles(remaining, article_count=target - len(selections))
+                extra = deduplicate_selections(extra, remaining, embedder)
+                selections.extend(extra[:target - len(selections)])
+                logger.info(f"Backfilled to {len(selections)} selections")
 
         # Write
         logger.info("Writing articles...")
         writer = ArticleWriter()
         writer.set_memory_context_fn(memory_mgr.get_context_for_post)
         articles = writer.write_batch(selections)
+
+        # Post-write dedup: check written articles for similarity by headline
+        logger.info("Post-write dedup on headlines...")
+        from sklearn.metrics.pairwise import cosine_similarity as cos_sim
+        import numpy as np
+        headline_texts = [a.get("headline", "") for a in articles]
+        if len(headline_texts) > 1:
+            h_embeddings = embedder.generate_batch_embeddings(headline_texts)
+            sim = cos_sim(np.array(h_embeddings))
+            to_remove = set()
+            for i in range(len(articles)):
+                if i in to_remove: continue
+                for j in range(i+1, len(articles)):
+                    if j in to_remove: continue
+                    if sim[i][j] > 0.6:
+                        to_remove.add(j)
+                        logger.info(f"Post-write dedup: removing \"{articles[j].get('headline','')[:50]}\" (sim={sim[i][j]:.2f})")
+            if to_remove:
+                articles = [a for idx, a in enumerate(articles) if idx not in to_remove]
+                logger.info(f"After post-write dedup: {len(articles)} articles")
 
         # Edit
         logger.info("Editing articles...")
@@ -434,6 +490,37 @@ def main():
         pipeline_run.articles_generated = len(published)
         pipeline_run.completed_at = datetime.utcnow()
         db.commit()
+
+        # ── Extract source profiles from raw scrape ──
+        logger.info("Updating source profiles...")
+        try:
+            with open("data/raw_scrape.json") as f:
+                raw_data = json.load(f)
+            existing_sources = {}
+            try:
+                with open("data/source_profiles.json") as f:
+                    for s in json.load(f):
+                        existing_sources[s["name"]] = s
+            except FileNotFoundError:
+                pass
+            for post in raw_data.get("company_posts", []) + raw_data.get("profile_posts", []):
+                raw = post.get("_raw", {})
+                author = raw.get("author", {})
+                name = author.get("name", "")
+                if not name or name in existing_sources:
+                    continue
+                avatar = author.get("avatar", {})
+                pic_url = avatar.get("url", "") if isinstance(avatar, dict) else ""
+                url = author.get("linkedinUrl", "").replace("/posts", "").rstrip("/")
+                existing_sources[name] = {
+                    "name": name, "linkedin_url": url, "avatar_url": pic_url,
+                    "headline": author.get("info", ""), "type": author.get("type", "profile"),
+                }
+            with open("data/source_profiles.json", "w") as f:
+                json.dump(list(existing_sources.values()), f, indent=2)
+            logger.info(f"Source profiles: {len(existing_sources)} total")
+        except Exception as e:
+            logger.warning(f"Source profile extraction failed: {e}")
 
         # ── Push to Supabase ──
         if use_supabase:

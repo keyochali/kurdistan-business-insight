@@ -107,7 +107,7 @@ class MemoryManager:
     def __init__(self, db: Session):
         self.db = db
         self.client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
-        self.model = "claude-sonnet-4-20250514"
+        self.model = "claude-haiku-4-5-20251001"  # Haiku for memory extraction (fast, cheap)
 
     def ensure_all_memories_exist(self):
         """Create ProfileMemory records for any profiles/companies that don't have one."""

@@ -22,7 +22,7 @@ from backend.processing.embeddings import EmbeddingEngine
 logger = logging.getLogger(__name__)
 
 # Two articles with cosine similarity above this threshold are considered duplicates
-SIMILARITY_THRESHOLD = 0.72
+SIMILARITY_THRESHOLD = 0.55
 
 
 def get_recent_headlines(db: Session, days: int = 7, limit: int = 60) -> list[str]:

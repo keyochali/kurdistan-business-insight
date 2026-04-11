@@ -6,6 +6,7 @@ import { ArrowLeft, Clock, Calendar, X, ChevronLeft, ChevronRight, ExternalLink 
 import { fetchArticle } from "../utils/api";
 import { getCategoryBadgeStyle } from "../components/CategoryFilter";
 import SourceBadge from "../components/SourceBadge";
+import LikeButton from "../components/LikeButton";
 
 const SITE_URL = "https://frontend-eight-azure-29.vercel.app";
 
@@ -292,6 +293,7 @@ export default function ArticlePage() {
             {article.sources && article.sources.length > 0 && (
               <SourceBadge sources={article.sources} />
             )}
+            <LikeButton articleId={article.id} />
           </div>
         </motion.header>
 

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Clock, ArrowUpRight } from "lucide-react";
 import { getCategoryBadgeStyle } from "./CategoryFilter";
 import SourceBadge from "./SourceBadge";
+import LikeButton from "./LikeButton";
 
 export default function ArticleCard({ article, featured = false, index = 0 }) {
   const {
@@ -84,10 +85,13 @@ export default function ArticleCard({ article, featured = false, index = 0 }) {
                       <span className="truncate max-w-[200px]">{author_attribution}</span>
                     ) : null}
                   </div>
-                  <ArrowUpRight
-                    size={16}
-                    className="text-neutral-300 group-hover:text-accent-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
-                  />
+                  <div className="flex items-center gap-3">
+                    <LikeButton articleId={article.id} />
+                    <ArrowUpRight
+                      size={16}
+                      className="text-neutral-300 group-hover:text-accent-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -162,10 +166,13 @@ export default function ArticleCard({ article, featured = false, index = 0 }) {
                   </>
                 )}
               </div>
-              <ArrowUpRight
-                size={14}
-                className="text-neutral-300 group-hover:text-accent-400 transition-colors duration-300"
-              />
+              <div className="flex items-center gap-2">
+                <LikeButton articleId={article.id} />
+                <ArrowUpRight
+                  size={14}
+                  className="text-neutral-300 group-hover:text-accent-400 transition-colors duration-300"
+                />
+              </div>
             </div>
           </div>
         </article>
