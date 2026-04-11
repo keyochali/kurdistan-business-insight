@@ -482,6 +482,29 @@ def main():
         published = publisher.publish_batch(edited, today, pipeline_run.id)
         logger.info(f"Published {len(published)} articles")
 
+        # Generate images for articles without photos
+        logger.info("Generating images for articles without photos...")
+        from backend.generation.image_gen import generate_article_image, download_and_upload_image
+        no_image_count = 0
+        for article in published:
+            if not article.featured_image_url:
+                img_url = generate_article_image(
+                    headline=article.headline,
+                    category=article.category or "Business",
+                    summary=article.summary or "",
+                )
+                if img_url:
+                    # Download and get permanent URL
+                    permanent_url = download_and_upload_image(img_url, article.slug)
+                    if permanent_url:
+                        article.featured_image_url = permanent_url
+                        no_image_count += 1
+        if no_image_count:
+            db.commit()
+            logger.info(f"Generated {no_image_count} images for articles without photos")
+        else:
+            logger.info("All articles already have images")
+
         # Update memories
         logger.info("Updating memories...")
         memory_mgr.update_daily_memories(today)
