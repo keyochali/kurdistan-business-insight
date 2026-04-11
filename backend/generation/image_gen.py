@@ -1,24 +1,24 @@
 """
 Flux AI image generation for articles without photos.
-Generates consistent branded illustrations using BFL's Flux API.
+Generates branded illustrations with colors extracted from source logos.
 """
 
+import io
 import logging
 import time
 from typing import Optional
 
 import httpx
+from colorthief import ColorThief
 
 logger = logging.getLogger(__name__)
 
 BFL_API_KEY = "bfl_pJlq13nkxWGXHZULc5IM4JRqCB5zkY8m"
 BFL_BASE = "https://api.bfl.ai/v1"
-MODEL = "flux-pro-1.1"  # Good balance of quality and cost
+MODEL = "flux-pro-1.1"
 
-# Consistent brand style prefix for all generated images
-STYLE_PREFIX = (
+STYLE_BASE = (
     "Minimalist modern editorial illustration, clean geometric shapes, "
-    "muted color palette with black white and warm gold (#C8A960) accents, "
     "professional business magazine style, subtle gradients, "
     "abstract conceptual art. "
     "CRITICAL: absolutely no text, no letters, no words, no numbers, no captions, "
@@ -27,20 +27,72 @@ STYLE_PREFIX = (
 )
 
 
+def rgb_to_hex(rgb):
+    return "#{:02x}{:02x}{:02x}".format(*rgb)
+
+
+def extract_colors_from_url(image_url: str, count: int = 4) -> list[str]:
+    """Download an image and extract dominant colors as hex strings."""
+    try:
+        r = httpx.get(image_url, timeout=10, follow_redirects=True)
+        if r.status_code != 200:
+            return []
+        ct = ColorThief(io.BytesIO(r.content))
+        palette = ct.get_palette(color_count=count, quality=5)
+        return [rgb_to_hex(c) for c in palette[:count]]
+    except Exception as e:
+        logger.debug(f"Color extraction failed for {image_url[:50]}: {e}")
+        return []
+
+
+def get_source_colors(sources: list[dict]) -> list[str]:
+    """Extract colors from source profile avatars/logos."""
+    all_colors = []
+    for src in sources[:3]:  # max 3 sources
+        avatar = src.get("avatar_url", "")
+        if avatar:
+            colors = extract_colors_from_url(avatar, count=3)
+            all_colors.extend(colors)
+    # Deduplicate and limit
+    seen = set()
+    unique = []
+    for c in all_colors:
+        if c not in seen:
+            seen.add(c)
+            unique.append(c)
+    return unique[:5]
+
+
+def build_color_prompt(colors: list[str]) -> str:
+    """Build a color directive for the image prompt."""
+    if not colors:
+        return "Color palette: black, white, and warm gold (#C8A960) accents. "
+    hex_list = ", ".join(colors)
+    return f"Color palette inspired by these brand colors: {hex_list}. Use these as the primary accent colors alongside black and white. "
+
+
 def generate_article_image(
     headline: str,
     category: str,
     summary: str = "",
+    sources: list[dict] = None,
     width: int = 1440,
     height: int = 768,
 ) -> Optional[str]:
     """
     Generate a branded illustration for an article.
+    Extracts colors from source logos for brand-aligned images.
     Returns the image URL or None on failure.
     """
-    # Build a focused prompt from the article content
+    # Extract colors from source avatars/logos
+    colors = get_source_colors(sources or [])
+    color_directive = build_color_prompt(colors)
+    if colors:
+        logger.info(f"  Brand colors from sources: {colors}")
+
     prompt = (
-        f"{STYLE_PREFIX}"
+        f"{STYLE_BASE}"
+        f"{color_directive}"
         f"Topic: {headline}. "
         f"Category: {category}. "
         f"{summary[:150] if summary else ''}"

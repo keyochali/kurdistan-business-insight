@@ -485,13 +485,28 @@ def main():
         # Generate images for articles without photos
         logger.info("Generating images for articles without photos...")
         from backend.generation.image_gen import generate_article_image, download_and_upload_image
+
+        # Load source profiles for color extraction
+        source_profiles = []
+        try:
+            with open("data/source_profiles.json") as f:
+                source_profiles = json.load(f)
+        except: pass
+
+        def match_sources(attr):
+            if not attr: return []
+            attr_lower = attr.lower()
+            return [s for s in source_profiles if s.get("name") and s["name"].lower() in attr_lower]
+
         no_image_count = 0
         for article in published:
             if not article.featured_image_url:
+                article_sources = match_sources(article.author_attribution)
                 img_url = generate_article_image(
                     headline=article.headline,
                     category=article.category or "Business",
                     summary=article.summary or "",
+                    sources=article_sources,
                 )
                 if img_url:
                     # Download and get permanent URL
