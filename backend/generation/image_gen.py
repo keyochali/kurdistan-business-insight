@@ -18,15 +18,12 @@ BFL_BASE = "https://api.bfl.ai/v1"
 MODEL = "flux-pro-1.1"
 
 STYLE_BASE = (
-    "Professional business editorial photo-illustration. "
-    "Show relevant real-world business objects and scenes: "
-    "laptops, office buildings, handshakes, charts on screens, conference rooms, "
-    "city skylines, factory floors, retail stores, construction sites, medical equipment, "
-    "smartphones, logistics trucks, server rooms — whatever fits the article topic. "
-    "Photorealistic 3D render style with shallow depth of field, soft studio lighting, "
-    "clean composition, modern and premium feel. "
+    "Minimalist modern editorial illustration, clean geometric shapes, "
+    "professional business magazine style, subtle gradients, "
+    "abstract conceptual art. "
     "CRITICAL: absolutely no text, no letters, no words, no numbers, no captions, "
-    "no writing of any kind anywhere in the image. "
+    "no titles, no labels, no watermarks, no signatures, no writing of any kind "
+    "anywhere in the image. Pure visual illustration only. "
 )
 
 
