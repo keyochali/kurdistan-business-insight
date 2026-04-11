@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Clock, Calendar, X, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, X, ChevronLeft, ChevronRight, ExternalLink, Heart } from "lucide-react";
 import { fetchArticle } from "../utils/api";
 import { getCategoryBadgeStyle } from "../components/CategoryFilter";
 import SourceBadge from "../components/SourceBadge";
@@ -293,47 +293,14 @@ export default function ArticlePage() {
             {article.sources && article.sources.length > 0 && (
               <SourceBadge sources={article.sources} />
             )}
-            <LikeButton articleId={article.id} />
+            {article.likes_count > 0 && (
+              <span className="flex items-center gap-1 text-neutral-400">
+                <Heart size={12} className="text-red-400 fill-red-400" />
+                <span className="text-xs">{article.likes_count}</span>
+              </span>
+            )}
           </div>
         </motion.header>
-
-        {/* Source profiles card */}
-        {article.sources && article.sources.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="mb-10 flex flex-wrap gap-3"
-          >
-            {article.sources.map((source, i) => (
-              <a
-                key={i}
-                href={source.linkedin_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 pl-1 pr-4 py-1 rounded-full border border-neutral-200 hover:border-accent-300 hover:bg-accent-50/50 transition-all group"
-              >
-                {source.avatar_url ? (
-                  <img
-                    src={source.avatar_url}
-                    alt={source.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center">
-                    <span className="text-xs font-bold text-neutral-400">{source.name?.charAt(0)}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-medium text-neutral-700 group-hover:text-neutral-900 transition-colors">
-                    {source.name}
-                  </span>
-                  <ExternalLink size={11} className="text-neutral-300 group-hover:text-accent-400 transition-colors" />
-                </div>
-              </a>
-            ))}
-          </motion.div>
-        )}
 
         {/* Summary */}
         {article.summary && (
@@ -440,8 +407,16 @@ export default function ArticlePage() {
           </div>
         )}
 
+        {/* Like section */}
+        <div className="mt-14 pt-8 border-t border-neutral-200 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-neutral-500">Did you find this article useful?</span>
+            <LikeButton articleId={article.id} />
+          </div>
+        </div>
+
         {/* Bottom nav */}
-        <div className="mt-14 pt-8 border-t border-neutral-200">
+        <div className="mt-8 pt-6 border-t border-neutral-100">
           <Link
             to="/"
             className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-neutral-900 transition-colors group"
