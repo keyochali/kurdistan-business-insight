@@ -82,27 +82,6 @@ export default function HomePage() {
               </h2>
             </div>
 
-            {/* Stats */}
-            <div className="flex gap-4 sm:gap-8 pb-1">
-              <div className="flex items-center gap-2.5 text-neutral-400">
-                <Newspaper size={16} strokeWidth={1.5} />
-                <span className="text-sm">
-                  <span className="font-semibold text-neutral-900">Daily</span> articles
-                </span>
-              </div>
-              <div className="flex items-center gap-2.5 text-neutral-400">
-                <Users size={16} strokeWidth={1.5} />
-                <span className="text-sm">
-                  <span className="font-semibold text-neutral-900">46+</span> sources
-                </span>
-              </div>
-              <div className="flex items-center gap-2.5 text-neutral-400">
-                <TrendingUp size={16} strokeWidth={1.5} />
-                <span className="text-sm">
-                  <span className="font-semibold text-neutral-900">Curated</span> insights
-                </span>
-              </div>
-            </div>
           </div>
         )}
       </motion.section>
