@@ -20,7 +20,10 @@ STYLE_PREFIX = (
     "Minimalist modern editorial illustration, clean geometric shapes, "
     "muted color palette with black white and warm gold (#C8A960) accents, "
     "professional business magazine style, subtle gradients, "
-    "no text or words in the image, abstract conceptual art. "
+    "abstract conceptual art. "
+    "CRITICAL: absolutely no text, no letters, no words, no numbers, no captions, "
+    "no titles, no labels, no watermarks, no signatures, no writing of any kind "
+    "anywhere in the image. Pure visual illustration only. "
 )
 
 
