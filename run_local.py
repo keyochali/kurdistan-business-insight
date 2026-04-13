@@ -304,9 +304,10 @@ def main():
             with open('data/raw_scrape.json', 'w') as f:
                 json.dump(raw_data, f, default=str, indent=2)
 
-            todays_posts = filter_todays_posts(all_posts, today, lookback_days=7)
+            todays_posts = filter_todays_posts(all_posts, today, lookback_days=1)
             if len(todays_posts) < 20:
-                todays_posts = filter_todays_posts(all_posts, today, lookback_days=30)
+                logger.info(f"Only {len(todays_posts)} posts from last 1 day, trying 7 days...")
+                todays_posts = filter_todays_posts(all_posts, today, lookback_days=7)
 
             if not todays_posts:
                 logger.warning("No posts found!")

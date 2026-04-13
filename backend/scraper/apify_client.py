@@ -118,7 +118,7 @@ class LinkedInScraper:
         for i in range(0, len(all_urls), batch_size):
             batch = all_urls[i : i + batch_size]
             try:
-                raw_posts = self.scrape_posts(batch, max_posts=max_posts, posted_limit="month")
+                raw_posts = self.scrape_posts(batch, max_posts=max_posts, posted_limit="week")
             except Exception as e:
                 logger.error(f"Batch {i // batch_size + 1} failed: {e}")
                 continue
