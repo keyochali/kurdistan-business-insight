@@ -175,20 +175,60 @@ def push_articles_to_supabase(db):
     logger.info("Articles pushed to Supabase")
 
 
+def _upload_avatar_to_supabase(name, avatar_url):
+    """Download a LinkedIn avatar and upload to Supabase Storage.
+    Returns the permanent Supabase public URL, or the original URL on failure."""
+    if not avatar_url or "licdn.com" not in avatar_url:
+        return avatar_url
+    try:
+        r = httpx.get(avatar_url, timeout=15, follow_redirects=True)
+        if r.status_code != 200:
+            return avatar_url
+        ct = r.headers.get("content-type", "")
+        ext = ".png" if "png" in ct else ".jpg"
+        slug = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')
+        storage_path = f"avatars/{slug}{ext}"
+        upload = httpx.post(
+            f"{SUPABASE_URL}/storage/v1/object/article-images/{storage_path}",
+            headers={
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}",
+                "Content-Type": ct or "image/jpeg",
+                "x-upsert": "true",
+            },
+            content=r.content,
+            timeout=30,
+        )
+        if upload.status_code in (200, 201):
+            public_url = f"{SUPABASE_URL}/storage/v1/object/public/article-images/{storage_path}"
+            return public_url
+    except Exception as e:
+        logger.debug(f"Avatar upload failed for {name}: {e}")
+    return avatar_url
+
+
 def push_source_profiles_to_supabase():
-    """Push source profiles to Supabase."""
+    """Push source profiles to Supabase, uploading avatars to Storage."""
     try:
         with open("data/source_profiles.json") as f:
             sources = json.load(f)
+        uploaded = 0
         for s in sources:
+            avatar = s.get("avatar_url", "")
+            # Upload LinkedIn avatars to Supabase Storage (LinkedIn blocks hotlinking)
+            if avatar and "licdn.com" in avatar:
+                new_url = _upload_avatar_to_supabase(s["name"], avatar)
+                if new_url != avatar:
+                    uploaded += 1
+                avatar = new_url
             supa_upsert("source_profiles", {
                 "name": s["name"],
                 "linkedin_url": s["linkedin_url"],
-                "avatar_url": s["avatar_url"],
+                "avatar_url": avatar,
                 "headline": s.get("headline", ""),
                 "type": s.get("type", "profile"),
             })
-        logger.info(f"Pushed {len(sources)} source profiles to Supabase")
+        logger.info(f"Pushed {len(sources)} source profiles to Supabase ({uploaded} avatars uploaded)")
     except FileNotFoundError:
         pass
 

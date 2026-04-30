@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ExternalLink } from "lucide-react";
 
@@ -6,6 +6,25 @@ import { X, ExternalLink } from "lucide-react";
  * Small inline avatars for article sources.
  * Clicking opens a modal with full source details and LinkedIn links.
  */
+
+function AvatarImg({ src, alt, className, fallbackChar }) {
+  const [failed, setFailed] = useState(false);
+  if (failed || !src) {
+    return (
+      <div className={className + " bg-neutral-100 flex items-center justify-center"}>
+        <span className="text-sm font-semibold text-neutral-400">{fallbackChar}</span>
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 function SourceModal({ sources, onClose }) {
   return (
@@ -50,19 +69,12 @@ function SourceModal({ sources, onClose }) {
             >
               {/* Avatar */}
               <div className="flex-shrink-0">
-                {source.avatar_url ? (
-                  <img
-                    src={source.avatar_url}
-                    alt={source.name}
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-neutral-100"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-neutral-400">
-                      {source.name?.charAt(0)}
-                    </span>
-                  </div>
-                )}
+                <AvatarImg
+                  src={source.avatar_url}
+                  alt={source.name}
+                  className="w-12 h-12 rounded-full object-cover ring-2 ring-neutral-100"
+                  fallbackChar={source.name?.charAt(0)}
+                />
               </div>
 
               {/* Info */}
@@ -120,19 +132,12 @@ export default function SourceBadge({ sources, compact = false }) {
               className="relative"
               style={{ zIndex: 3 - i }}
             >
-              {source.avatar_url ? (
-                <img
-                  src={source.avatar_url}
-                  alt={source.name}
-                  className="w-6 h-6 rounded-full object-cover ring-2 ring-white group-hover:ring-accent-100 transition-all"
-                />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-neutral-200 ring-2 ring-white flex items-center justify-center">
-                  <span className="text-[9px] font-bold text-neutral-500">
-                    {source.name?.charAt(0)}
-                  </span>
-                </div>
-              )}
+              <AvatarImg
+                src={source.avatar_url}
+                alt={source.name}
+                className="w-6 h-6 rounded-full object-cover ring-2 ring-white group-hover:ring-accent-100 transition-all"
+                fallbackChar={source.name?.charAt(0)}
+              />
             </div>
           ))}
         </div>
