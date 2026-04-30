@@ -54,6 +54,13 @@ class ArticlePublisher:
         if image_url:
             featured_image_local = self._download_image(image_url, slug)
 
+        # Upload to Supabase Storage so we don't hotlink LinkedIn CDN (which blocks it)
+        stored_image_url = image_url
+        if featured_image_local and image_url and "licdn.com" in image_url:
+            supabase_url = self._upload_to_supabase_storage(featured_image_local, slug)
+            if supabase_url:
+                stored_image_url = supabase_url
+
         article = Article(
             slug=slug,
             headline=headline,
@@ -63,7 +70,7 @@ class ArticlePublisher:
             body_markdown=article_data.get("body_markdown", ""),
             category=article_data.get("category", "General"),
             tags=article_data.get("tags", []),
-            featured_image_url=image_url,
+            featured_image_url=stored_image_url,
             featured_image_local=featured_image_local,
             author_attribution=article_data.get("author_attribution", ""),
             publish_date=publish_date,
@@ -80,10 +87,17 @@ class ArticlePublisher:
         for img_url in self._collect_all_images(source_posts):
             if img_url == image_url:
                 continue  # Skip featured image
-            local = self._download_image(img_url, f"{slug}-{hashlib.md5(img_url.encode()).hexdigest()[:8]}")
+            img_hash = hashlib.md5(img_url.encode()).hexdigest()[:8]
+            local = self._download_image(img_url, f"{slug}-{img_hash}")
+            # Upload to Supabase Storage if it's a LinkedIn URL
+            stored_url = img_url
+            if local and "licdn.com" in img_url:
+                supabase_url = self._upload_to_supabase_storage(local, f"{slug}-{img_hash}")
+                if supabase_url:
+                    stored_url = supabase_url
             img = ArticleImage(
                 article_id=article.id,
-                image_url=img_url,
+                image_url=stored_url,
                 local_path=local,
                 is_featured=False,
             )
@@ -176,6 +190,44 @@ class ArticlePublisher:
 
         except Exception as e:
             logger.warning(f"Failed to download image {url}: {e}")
+            return None
+
+    def _upload_to_supabase_storage(self, local_path: str, slug: str) -> Optional[str]:
+        """Upload a locally downloaded image to Supabase Storage and return the public URL.
+        LinkedIn CDN URLs block hotlinking, so we must serve images from our own storage."""
+        try:
+            from backend.database.supabase_client import SUPABASE_URL, SUPABASE_KEY
+
+            filepath = self.images_dir.parent / local_path
+            if not filepath.exists():
+                return None
+
+            image_bytes = filepath.read_bytes()
+            ext = filepath.suffix.lower()
+            content_type = {".png": "image/png", ".webp": "image/webp", ".gif": "image/gif"}.get(ext, "image/jpeg")
+            storage_path = f"linkedin/{slug}{ext}"
+
+            r = httpx.post(
+                f"{SUPABASE_URL}/storage/v1/object/article-images/{storage_path}",
+                headers={
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_KEY}",
+                    "Content-Type": content_type,
+                    "x-upsert": "true",
+                },
+                content=image_bytes,
+                timeout=30,
+            )
+
+            if r.status_code in (200, 201):
+                public_url = f"{SUPABASE_URL}/storage/v1/object/public/article-images/{storage_path}"
+                logger.info(f"Uploaded to Supabase Storage: {public_url}")
+                return public_url
+
+            logger.warning(f"Supabase Storage upload failed: {r.status_code}")
+            return None
+        except Exception as e:
+            logger.warning(f"Supabase Storage upload error: {e}")
             return None
 
     @staticmethod
